@@ -1,4 +1,4 @@
-# 🔗 URL Shortener — Backend
+# 🔗 URL Shortener
 
 A simple **URL Shortener** built with **TypeScript**, **Express**, and **Prisma** (PostgreSQL).  
 It allows you to convert a long URL into a short one, then redirect to it while counting visits.
