@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { handlePostLink } from "./handler/handler.js";
+import { createSlug, redirectUrl } from "./handler/handler.js";
+import { validateBody } from "../middlewares/validate-body/validate-body.js";
+import { CreateSlugSchema, RedirectUrlSchema } from "./schema/index.js";
+import { validateParams } from "../middlewares/validate-param/validate-params.js";
+import { validateSlugParam } from "../middlewares/validate-slug-param/validate-slug-param.js";
 
 const linksRouter = Router();
 
-linksRouter.post("/", handlePostLink);
-// TODO
-linksRouter.get("/", (_req, res) => {
-    res.send({ message: "Links endpoint" });
-});
+linksRouter.post("/", validateBody(CreateSlugSchema), createSlug);
+linksRouter.get("/:slug", validateParams(RedirectUrlSchema), validateSlugParam, redirectUrl);
 
 export { linksRouter };

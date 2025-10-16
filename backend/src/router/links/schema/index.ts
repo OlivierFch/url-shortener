@@ -1,12 +1,21 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 
 /**
- * Payload wanted for POST /api/links
+ * Schema for creating a new slug.
  */
-const CreateLinkSchema = z.object({
-  longUrl: z.string().url()
+const CreateSlugSchema = z.object({
+  longUrl: z.string().trim().url()
 });
 
-type CreateLinkInput = z.infer<typeof CreateLinkSchema>;
+/**
+ * Schema for redirecting using a slug.
+ */
+const RedirectUrlSchema = z.object({
+  slug: z.string()
+});
 
-export { CreateLinkSchema, type CreateLinkInput };
+type CreateSlugInput = z.infer<typeof CreateSlugSchema>;
+type RedirectUrlInput = z.infer<typeof RedirectUrlSchema>;
+
+export { CreateSlugSchema, RedirectUrlSchema };
+export type { CreateSlugInput, RedirectUrlInput };

@@ -1,5 +1,12 @@
-// TODO: JSDoc
+/**
+ * Checks if the provided long URL is safe.
+ * @param longUrl 
+ * @returns 
+ */
+// TODO: To be implemented
 // TODO: TU
-const isLongUrlSafe = async (longUrl: string) => {};
+const isLongUrlSafe = (longUrl: string): { isSafe: boolean; error?: string } => {
+    return { isSafe: true };
+};
 
 export { isLongUrlSafe };

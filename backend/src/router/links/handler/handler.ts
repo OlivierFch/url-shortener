@@ -1,26 +1,19 @@
 import { Request, Response } from "express";
-import { createSlugByLongUrl } from "../../../service/index.js";
-import { CreateLinkInput, CreateLinkSchema } from "../schema/index.js";
+import { createSlugByLongUrl, getUrlBySlug } from "../../../service/index.js";
 import { toUrlResponse } from "../../../utils/to-url-response/to-url-response.js";
-import { canonicalizeUrl } from "../../../utils/canonicalize-url/canonicalize-url.js";
 
 /**
  * Creates a new slug for a given long URL (idempotent).
- * @param {Request<CreateLinkInput>} req - Request object containing the long URL in the body.
+ * @param {Request} req - Request object containing the body.
  * @param {Response} res - Response object to send the result.
  */
 // TODO: Gérer les erreurs
 // TODO: TU
-const handlePostLink = async (req: Request<unknown, unknown, CreateLinkInput>, res: Response) => {
-    const parsed = CreateLinkSchema.safeParse(req.body);
-    if (!parsed.success) {
-        return res.status(400).send({ message: "Invalid request", details: parsed.error.flatten() });
-    }
-
+const createSlug = async (req: Request, res: Response) => {
     try {
-        const normalized = canonicalizeUrl(parsed.data.longUrl);
+        const { longUrl } = req.body;
 
-        const response = await createSlugByLongUrl(normalized);
+        const response = await createSlugByLongUrl(longUrl);
         const { isAlreadyCreated, link } = response;
 
         return res
@@ -31,10 +24,33 @@ const handlePostLink = async (req: Request<unknown, unknown, CreateLinkInput>, r
             });
     } catch (error: any) {
         if (error?.name === "ZodError") {
-            return res.status(400).send({ error: "Invalid request", details: error.flatten() } );
+            return res.status(400).json({ error: "Invalid request", details: error.flatten() } );
         }
-        return res.status(500).send({ message: "Internal server error" });
+        if (error?.statusCode) {
+            return res.status(error.statusCode).json({ message: error.error, details: error.flatten() });
+        }
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
-export { handlePostLink };
+/**
+ * Redirects to the long URL associated with the given slug.
+ * @param {Request} req - Request object containing the slug parameter.
+ * @param {Response} res - Response object to handle the redirection.
+ */
+// TODO: TU
+const redirectUrl = async (req: Request, res: Response) => {
+    try {
+        const { slug } = req.params;
+        if (!slug) return res.status(400).json({ message: "Bad request", details: "Missing slug" });
+
+        const url = await getUrlBySlug(slug);
+        if (!url) return res.status(404).json({ message: "Not found", details: "Url not found" });
+
+        return res.redirect(302, url.longUrl);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export { createSlug, redirectUrl };

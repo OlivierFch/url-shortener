@@ -12,8 +12,8 @@ const DEFAULT_QUERY_PARAMETERS_TO_REMOVE = [
  * Canonicalizes a given long URL by normalizing it.
  * This includes removing hashes, trailing slashes, sorting query parameters,
  * and removing common tracking parameters.
- * @param longUrl 
- * @returns 
+ * @param longUrl - The original long URL to be canonicalized.
+ * @returns {string} The canonicalized URL.
  */
 const canonicalizeUrl = (longUrl: string): string => {
     return normalizeUrl(longUrl, {

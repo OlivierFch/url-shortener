@@ -1,3 +1,5 @@
+import { Link } from "@prisma/client";
+
 interface UrlResponse {
     slug: string;
     longUrl: string;
@@ -5,4 +7,6 @@ interface UrlResponse {
     hitCount: number;
 }
 
-export type { UrlResponse };
+type CreateLinkResult = { isAlreadyCreated: boolean, link: Link };
+
+export type { CreateLinkResult, UrlResponse };
