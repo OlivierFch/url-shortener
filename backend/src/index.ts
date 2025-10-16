@@ -11,7 +11,6 @@ dotenv.config();
 
 const app = express();
 
-// TODO: Faire un dossier pour toutes les injections autour d'Express
 app.use(helmet());
 app.use(express.json());
 app.use(cors({ origin: env.CORS_ORIGIN ?? "http://localhost:5173" }));
@@ -19,7 +18,6 @@ app.use(cors({ origin: env.CORS_ORIGIN ?? "http://localhost:5173" }));
 app.use("/health", healthcheckRouter);
 app.use("/", linksRouter);
 
-// 404 handler
 app.use(notFound);
 
 app.listen(env.PORT, () => {

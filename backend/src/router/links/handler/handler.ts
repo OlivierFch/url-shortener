@@ -7,7 +7,6 @@ import { toUrlResponse } from "../../../utils/to-url-response/to-url-response.js
  * @param {Request} req - Request object containing the body.
  * @param {Response} res - Response object to send the result.
  */
-// TODO: Gérer les erreurs
 // TODO: TU
 const createSlug = async (req: Request, res: Response) => {
     try {
