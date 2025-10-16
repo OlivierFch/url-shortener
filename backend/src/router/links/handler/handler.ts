@@ -42,8 +42,6 @@ const createSlug = async (req: Request, res: Response) => {
 const redirectUrl = async (req: Request, res: Response) => {
     try {
         const { slug } = req.params;
-        if (!slug) return res.status(400).json({ message: "Bad request", details: "Missing slug" });
-
         const url = await getUrlBySlug(slug);
         if (!url) return res.status(404).json({ message: "Not found", details: "Url not found" });
 
