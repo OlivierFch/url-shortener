@@ -1,4 +1,4 @@
-import { createSlug, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.js";
+import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.js";
 import { generateSlug } from "../utils/generate-slug/generate-slug.js";
 import { canonicalizeUrl } from "../utils/canonicalize-url/canonicalize-url.js";
 import { isLongUrlSafe } from "../utils/is-long-url-safe/is-long-url-safe.js";
@@ -42,4 +42,13 @@ const getUrlBySlug = async (slug: string): Promise<Link | null> => {
     return result;
 };
 
-export { createSlugByLongUrl, getUrlBySlug };
+/**
+ * Gets all existing links.
+ * @returns {Promise<Link[]>} An array of Link objects.
+ */
+const getLinks = async (): Promise<Link[]> => {
+    const links = await findAllLinks();
+    return links;
+};
+
+export { createSlugByLongUrl, getLinks, getUrlBySlug };

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createSlugByLongUrl, getUrlBySlug } from "../../../service/index.js";
+import { createSlugByLongUrl, getLinks, getUrlBySlug } from "../../../service/index.js";
 import { toUrlResponse } from "../../../utils/to-url-response/to-url-response.js";
 
 /**
@@ -50,4 +50,19 @@ const redirectUrl = async (req: Request, res: Response) => {
     }
 };
 
-export { createSlug, redirectUrl };
+/**
+ * Retrieves all existing links.
+ * @param {Request} req - Request object.
+ * @param {Response} res - Response object to send the result.
+ */
+// TODO: TU
+const getAllLinks = async (req: Request, res: Response) => {
+    try {
+        const links = await getLinks();
+        return res.status(200).send({ message: "Links retrieved successfully", data: links.map((link) => toUrlResponse(link)) });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export { createSlug, getAllLinks, redirectUrl };

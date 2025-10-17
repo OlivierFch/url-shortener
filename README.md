@@ -61,10 +61,8 @@ Backend available on "http://localhost:3000"
 
 ## 🚀 Features
 
-- Create short URLs (`POST /api/links`)
-- Redirect via slug (`GET /:slug`)
-- Retrieve link metadata (`GET /api/links/:slug`)
+- Create short URLs (`POST /`)
+- Redirect to long URL via slug (`GET /:slug`)
 - Increment hit counter on redirect
 - Strong URL validation & normalization
 - Idempotent: same long URL → same slug
-- Ready for Docker or local PostgreSQL
