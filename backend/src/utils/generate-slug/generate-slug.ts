@@ -1,7 +1,10 @@
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
+
+const ALPHANUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 const generateSlug = async (length = 6): Promise<string> => {
-    return nanoid(length);
+    const slug = customAlphabet(ALPHANUM, length);
+    return slug();
 };
 
 export { generateSlug };
