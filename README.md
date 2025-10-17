@@ -63,6 +63,7 @@ Backend available on "http://localhost:3000"
 
 - Create short URLs (`POST /`)
 - Redirect to long URL via slug (`GET /:slug`)
+- Retrieve all existing links (`GET /links`)
 - Increment hit counter on redirect
 - Strong URL validation & normalization
 - Idempotent: same long URL → same slug
