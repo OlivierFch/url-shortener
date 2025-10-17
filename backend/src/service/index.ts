@@ -1,31 +1,50 @@
 import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.js";
 import { generateSlug } from "../utils/generate-slug/generate-slug.js";
 import { canonicalizeUrl } from "../utils/canonicalize-url/canonicalize-url.js";
-import { isLongUrlSafe } from "../utils/is-long-url-safe/is-long-url-safe.js";
 import { CreateLinkResult } from "../interfaces/index.js";
-import { Link } from "@prisma/client";
+import { Link, Prisma } from "@prisma/client";
+import { getSlugLength } from "../utils/get-slug-length/get-slug-length.js";
+
+const MAX_SLUG_GENERATION_ATTEMPTS = 5;
 
 /**
- * Creates / Retrieves a slug for a given long URL.
- * If the long URL already has a slug, it returns the existing one.
- * Otherwise, it generates a new slug, saves it, and returns it.
- * @param {string} longUrl - The original long URL to be shortened.
- * @returns {Promise<CreateLinkResult>} An object containing a flag indicating if the slug was already created and the Link object.
+ * Creates / retrieves a slug for the given long URL.
+ * If the slug already exists, it returns the existing link.
+ * Otherwise, it generates a new slug and creates a new link.
+ * @param {string} longUrl - The long URL to shorten.
+ * @returns {Promise<CreateLinkResult>} The result containing the link and whether it was already created.
  */
 // TODO: TU
 const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> => {
-    const { isSafe, error } = isLongUrlSafe(longUrl);
-    if(!isSafe) throw { error: error ?? "Invalid url", statusCode: 400 };
-    
     const normalizedUrl = canonicalizeUrl(longUrl);
-    const existingLink = await findByLongUrl(normalizedUrl);
 
-    if (existingLink) return { isAlreadyCreated: true, link: existingLink };
+    for (let attempt = 1; attempt <= MAX_SLUG_GENERATION_ATTEMPTS; attempt++) {
+        const slugLength = getSlugLength(attempt);
+        const slug = await generateSlug(slugLength);
 
-    const slug = await generateSlug();
-    const createdLink = await createSlug({ longUrl, slug });
+        try {
+            const createdLink = await createSlug({ longUrl: normalizedUrl, slug });
+            return { isAlreadyCreated: false, link: createdLink };
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                // Prisma known error code for unique constraint violation
+                if (error?.code === "P2002") {
+                    const existingLongUrl = await findByLongUrl(normalizedUrl);
+                    if (existingLongUrl) return { isAlreadyCreated: true, link: existingLongUrl };
 
-    return { isAlreadyCreated: false, link: createdLink };
+                    if (attempt === MAX_SLUG_GENERATION_ATTEMPTS) {
+                        throw new Error("Unable to generate a unique slug after several attempts.");
+                    }
+                    continue; // Try again with a new slug
+                }
+            }
+            // Throw other errors
+            throw error;
+        }
+    }
+
+    // This point should not be reachable
+    throw new Error("Unreachable code reached in createSlugByLongUrl");
 };
 
 /**

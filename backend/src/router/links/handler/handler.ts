@@ -25,9 +25,6 @@ const createSlug = async (req: Request, res: Response) => {
         if (error?.name === "ZodError") {
             return res.status(400).json({ error: "Invalid request", details: error.flatten() } );
         }
-        if (error?.statusCode) {
-            return res.status(error.statusCode).json({ message: error.error, details: error.flatten() });
-        }
         return res.status(500).json({ message: "Internal server error" });
     }
 };
