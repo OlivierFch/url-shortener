@@ -5,9 +5,6 @@ import { getLinks, getUrlBySlug } from "./index.ts";
 jest.mock('nanoid', () => ({
   customAlphabet: () => () => 'mocked-id',
 }));
-jest.mock("normalize-url", () => ({
-  normalizeUrl: (url: string) => url,
-}));
 
 jest.mock("../data-access/index.ts", () => ({
     findAllLinks: jest.fn(),

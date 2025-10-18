@@ -17,10 +17,10 @@ const DEFAULT_QUERY_PARAMETERS_TO_REMOVE = [
  */
 const canonicalizeUrl = (longUrl: string): string => {
     return normalizeUrl(longUrl, {
-    stripHash: true,
-    removeTrailingSlash: true, 
-    sortQueryParameters: true,
-    removeQueryParameters: DEFAULT_QUERY_PARAMETERS_TO_REMOVE,
+      stripHash: true,
+      removeTrailingSlash: true, 
+      sortQueryParameters: true,
+      removeQueryParameters: DEFAULT_QUERY_PARAMETERS_TO_REMOVE,
   });
 };
 

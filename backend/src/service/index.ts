@@ -1,6 +1,5 @@
 import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.ts";
 import { generateSlug } from "../utils/generate-slug/generate-slug.ts";
-import { canonicalizeUrl } from "../utils/canonicalize-url/canonicalize-url.ts";
 import { CreateLinkResult } from "../interfaces/index.ts";
 import { Prisma } from "@prisma/client";
 import type { Link } from "@prisma/client";
@@ -17,20 +16,18 @@ const MAX_SLUG_GENERATION_ATTEMPTS = 5;
  */
 // TODO: TU
 const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> => {
-    const normalizedUrl = canonicalizeUrl(longUrl);
-
     for (let attempt = 1; attempt <= MAX_SLUG_GENERATION_ATTEMPTS; attempt++) {
         const slugLength = getSlugLength(attempt);
         const slug = generateSlug(slugLength);
 
         try {
-            const createdLink = await createSlug({ longUrl: normalizedUrl, slug });
+            const createdLink = await createSlug({ longUrl: longUrl, slug });
             return { isAlreadyCreated: false, link: createdLink };
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 // Prisma known error code for unique constraint violation
                 if (error?.code === "P2002") {
-                    const existingLongUrl = await findByLongUrl(normalizedUrl);
+                    const existingLongUrl = await findByLongUrl(longUrl);
                     if (existingLongUrl) return { isAlreadyCreated: true, link: existingLongUrl };
 
                     if (attempt === MAX_SLUG_GENERATION_ATTEMPTS) {

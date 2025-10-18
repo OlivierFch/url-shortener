@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { createSlugByLongUrl, getLinks, getUrlBySlug } from "../../../service/index.ts";
 import { toUrlResponse } from "../../../utils/to-url-response/to-url-response.ts";
+import { sendError } from "../../../utils/send-error/send-error.ts";
 
 /**
  * Creates a new slug for a given long URL (idempotent).
  * @param {Request} req - Request object containing the body.
  * @param {Response} res - Response object to send the result.
  */
-// TODO: TU
 const createSlug = async (req: Request, res: Response) => {
     try {
         const { longUrl } = req.body;
@@ -23,9 +23,9 @@ const createSlug = async (req: Request, res: Response) => {
             });
     } catch (error: any) {
         if (error?.name === "ZodError") {
-            return res.status(400).json({ error: "Invalid request", details: error.flatten() } );
+            return sendError(res, 400, "invalid-request", "Invalid Request");
         }
-        return res.status(500).json({ message: "Internal server error" });
+        return sendError(res, 500, "internal-server-error", "Internal server error");
     }
 };
 
@@ -34,16 +34,15 @@ const createSlug = async (req: Request, res: Response) => {
  * @param {Request} req - Request object containing the slug parameter.
  * @param {Response} res - Response object to handle the redirection.
  */
-// TODO: TU
 const redirectUrl = async (req: Request, res: Response) => {
     try {
         const { slug } = req.params;
         const url = await getUrlBySlug(slug);
-        if (!url) return res.status(404).json({ message: "Not found", details: "Url not found" });
+        if (!url) return sendError(res, 404, "url-not-found", "Url not found");
 
         return res.redirect(302, url.longUrl);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return sendError(res, 500, "internal-server-error", "Internal server error");
     }
 };
 
@@ -52,13 +51,12 @@ const redirectUrl = async (req: Request, res: Response) => {
  * @param {Request} req - Request object.
  * @param {Response} res - Response object to send the result.
  */
-// TODO: TU
 const getAllLinks = async (req: Request, res: Response) => {
     try {
         const links = await getLinks();
         return res.status(200).send({ message: "Links retrieved successfully", data: links.map((link) => toUrlResponse(link)) });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return sendError(res, 500, "internal-server-error", "Internal server error");
     }
 };
 
