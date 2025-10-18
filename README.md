@@ -8,11 +8,11 @@ Accessing that link automatically redirects to the original URL via an HTTP 302 
 
 ## 🚀 Features
 
-- ✳️ Create short URLs (POST /api/links)
+- ✳️ Create short URLs (POST /)
 
 - 🔁 Redirect to long URL via slug (GET /:slug)
 
-- 📋 List existing links (GET /api/links)
+- 📋 List existing links (GET /links)
 
 - 🔢 Increment hit counter on redirect
 
@@ -36,8 +36,9 @@ Accessing that link automatically redirects to the original URL via an HTTP 302 
 | ORM | Prisma |
 | Database | PostgreSQL 18 (via Docker Compose) + PgAdmin4 |
 | Validation | Zod |
-| Utils | nanoid, normalize-url, helmet, cors |
+| Utils | nanoid + normalize-url + helmet + cors |
 | Frontend | React + Vite + react-hook-form + Zod + SCSS |
+| Testing | Jest + Vitest + Supertest |
 
 <br>
 
