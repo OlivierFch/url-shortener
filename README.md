@@ -1,9 +1,30 @@
 # 🔗 URL Shortener
 
-A simple **URL Shortener** built with **TypeScript**, **Express**, and **Prisma** (PostgreSQL).  
-It allows you to convert a long URL into a short one, then redirect to it while counting visits.
+A simple and type-safe **URL Shortener** built with **TypeScript**, **Express**, **React**, and **Prisma (PostgreSQL)**.  
+When a user submits a long URL, the backend generates a short alphanumeric slug, stores it in the database, and returns a shortened link.  
+Accessing that link automatically redirects to the original URL via an HTTP 302 redirect.
 
----
+<br>
+
+## 🚀 Features
+
+- ✳️ Create short URLs (POST /api/links)
+
+- 🔁 Redirect to long URL via slug (GET /:slug)
+
+- 📋 List existing links (GET /api/links)
+
+- 🔢 Increment hit counter on redirect
+
+- ✅ Strong validation & normalization (Zod + normalize-url)
+
+- ♻️ Idempotent — same long URL → same slug
+
+- ⚡ Simple React frontend with live form validation
+
+- 🔐 Security middleware (Helmet, CORS)
+
+<br>
 
 ## 🧱 Tech Stack
 
@@ -11,59 +32,66 @@ It allows you to convert a long URL into a short one, then redirect to it while 
 |-------|------|
 | Language | TypeScript |
 | Runtime | Node.js |
-| Framework | Express |
+| Backend Framework | Express |
 | ORM | Prisma |
 | Database | PostgreSQL 18 (via Docker Compose) + PgAdmin4 |
 | Validation | Zod |
-| Utilities | nanoid, normalize-url, helmet, cors |
+| Utils | nanoid, normalize-url, helmet, cors |
+| Frontend | React + Vite + react-hook-form + Zod + SCSS |
 
+<br>
 
----
+## ⚙️ Prerequisites
 
-# 🔗 Prerequisites
-
-- Node.js (>=18)
-- npm
+- Node.js **>= 18**
+- npm (or pnpm)
 - Docker + Docker Compose
 
----
+<br>
 
-# Launches
-## Launch database (Postgres + PgAdmin)
-From project root
+## 🐘 Database Setup
+
+From the project root:
+
 ```bash
 docker compose up -d
 ```
-PostgreSQL: localhost:5433
-PgAdmin : http://localhost:5050
 
-Login to PgAdmin:
-```pgsql
-email: admin@example.com
-password: admin
+- PostgreSQL → http://localhost:5433
+- PgAdmin → http://localhost:5050
+
+Login credentials (defined in `docker-compose.yml`):
+```psql
+Email: admin@example.com
+Password: admin
 ```
-Update database if needed
+Then initialize Prisma
 ```bash
 cd backend
 cp .env.example .env
+npm install
 npm run prisma:migrate
 npm run prisma:generate
 ```
-## Launch backend
+
+<br>
+
+## 🖥️ Launch Backend
+
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-Backend available on "http://localhost:3000"
+Server available at → http://localhost:3000
 
----
+<br>
 
-## 🚀 Features
+## 🖥️ Launch Frontend
 
-- Create short URLs (`POST /`)
-- Redirect to long URL via slug (`GET /:slug`)
-- Retrieve all existing links (`GET /links`)
-- Increment hit counter on redirect
-- Strong URL validation & normalization
-- Idempotent: same long URL → same slug
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Frontend available at → http://localhost:5173
