@@ -38,7 +38,7 @@ Accessing that link automatically redirects to the original URL via an HTTP 302 
 | Validation | Zod |
 | Utils | nanoid + normalize-url + helmet + cors |
 | Frontend | React + Vite + react-hook-form + Zod + SCSS |
-| Testing | Jest + Vitest |
+| Testing | Jest |
 
 <br>
 
