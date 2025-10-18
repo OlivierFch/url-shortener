@@ -1,10 +1,10 @@
-import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.js";
-import { generateSlug } from "../utils/generate-slug/generate-slug.js";
-import { canonicalizeUrl } from "../utils/canonicalize-url/canonicalize-url.js";
-import { CreateLinkResult } from "../interfaces/index.js";
+import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.ts";
+import { generateSlug } from "../utils/generate-slug/generate-slug.ts";
+import { canonicalizeUrl } from "../utils/canonicalize-url/canonicalize-url.ts";
+import { CreateLinkResult } from "../interfaces/index.ts";
 import { Prisma } from "@prisma/client";
 import type { Link } from "@prisma/client";
-import { getSlugLength } from "../utils/get-slug-length/get-slug-length.js";
+import { getSlugLength } from "../utils/get-slug-length/get-slug-length.ts";
 
 const MAX_SLUG_GENERATION_ATTEMPTS = 5;
 
@@ -21,7 +21,7 @@ const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> =
 
     for (let attempt = 1; attempt <= MAX_SLUG_GENERATION_ATTEMPTS; attempt++) {
         const slugLength = getSlugLength(attempt);
-        const slug = await generateSlug(slugLength);
+        const slug = generateSlug(slugLength);
 
         try {
             const createdLink = await createSlug({ longUrl: normalizedUrl, slug });
@@ -54,7 +54,6 @@ const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> =
  * @param {string} slug - The slug to look up.
  * @returns {Promise<Link | null>} The Link object if found, otherwise null.
  */
-// TODO: TU
 const getUrlBySlug = async (slug: string): Promise<Link | null> => {
     const result = await findBySlug(slug);
     if (result) await incrementHitCount(slug);

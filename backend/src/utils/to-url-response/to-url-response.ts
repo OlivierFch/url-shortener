@@ -7,7 +7,6 @@ import { UrlResponse } from "../../interfaces/index.ts";
  * @param {string} base - The base URL for constructing the short URL. Defaults to "http://localhost:3000".
  * @returns {UrlResponse} The converted UrlResponse object.
  */
-// TODO: TU
 const toUrlResponse = (url: Link, base = "http://localhost:3000"): UrlResponse => {
     return {
         slug: url.slug,
