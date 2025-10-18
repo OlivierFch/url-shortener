@@ -1,5 +1,5 @@
-import { Link } from "@prisma/client";
-import { UrlResponse } from "../../interfaces/index.js";
+import type { Link } from "@prisma/client";
+import { UrlResponse } from "../../interfaces/index.ts";
 
 /**
  * Converts a Link object to a UrlResponse object.

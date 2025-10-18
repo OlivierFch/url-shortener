@@ -2,10 +2,10 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
-import { env } from "./env.js";
-import { healthcheckRouter } from "./router/healthcheck/index.js";
-import { linksRouter } from "./router/links/index.js";
-import { notFound } from "./router/middlewares/not-found/not-found.js";
+import { env } from "./env.ts";
+import { healthcheckRouter } from "./router/healthcheck/index.ts";
+import { linksRouter } from "./router/links/index.ts";
+import { notFound } from "./router/middlewares/not-found/not-found.ts";
 
 dotenv.config();
 

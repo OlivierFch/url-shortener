@@ -2,7 +2,8 @@ import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount 
 import { generateSlug } from "../utils/generate-slug/generate-slug.js";
 import { canonicalizeUrl } from "../utils/canonicalize-url/canonicalize-url.js";
 import { CreateLinkResult } from "../interfaces/index.js";
-import { Link, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import type { Link } from "@prisma/client";
 import { getSlugLength } from "../utils/get-slug-length/get-slug-length.js";
 
 const MAX_SLUG_GENERATION_ATTEMPTS = 5;

@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { createSlug, redirectUrl, getAllLinks } from "./handler/handler.js";
-import { validateBody } from "../middlewares/validate-body/validate-body.js";
-import { CreateSlugSchema, RedirectUrlSchema } from "./schema/index.js";
-import { validateParams } from "../middlewares/validate-param/validate-params.js";
-import { validateSlugParam } from "../middlewares/validate-slug-param/validate-slug-param.js";
+import { createSlug, redirectUrl, getAllLinks } from "./handler/handler.ts";
+import { validateBody } from "../middlewares/validate-body/validate-body.ts";
+import { CreateSlugSchema, RedirectUrlSchema } from "./schema/index.ts";
+import { validateParams } from "../middlewares/validate-param/validate-params.ts";
+import { validateSlugParam } from "../middlewares/validate-slug-param/validate-slug-param.ts";
 
 const linksRouter = Router();
 

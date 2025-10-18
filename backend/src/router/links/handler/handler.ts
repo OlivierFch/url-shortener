@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createSlugByLongUrl, getLinks, getUrlBySlug } from "../../../service/index.js";
-import { toUrlResponse } from "../../../utils/to-url-response/to-url-response.js";
+import { createSlugByLongUrl, getLinks, getUrlBySlug } from "../../../service/index.ts";
+import { toUrlResponse } from "../../../utils/to-url-response/to-url-response.ts";
 
 /**
  * Creates a new slug for a given long URL (idempotent).

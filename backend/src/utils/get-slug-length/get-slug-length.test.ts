@@ -1,4 +1,4 @@
-import { getSlugLength } from "./get-slug-length.js";
+import { getSlugLength } from "./get-slug-length.ts";
 
 describe("Unit test for getSlugLength", () => {
     test.each<{ attempt: number, expectedLength: number }>([

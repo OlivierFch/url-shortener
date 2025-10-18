@@ -1,4 +1,4 @@
-import { Link } from "@prisma/client";
+import type { Link } from "@prisma/client";
 
 interface UrlResponse {
     slug: string;
