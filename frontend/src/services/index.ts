@@ -1,48 +1,72 @@
 import { env } from "../env";
-import { ShortUrlResponse } from "../interfaces";
+import { ApiError, CreateShortLinkResponse, GetAllLinksResponse } from "../interfaces";
+import { isApiErrorShape, isCreateShortLinkResponse, isGetAllLinksResponse } from "../utils/type-guards/type-guard";
 
 const BASE = env.VITE_API_BASE_URL ?? "http://localhost:3000";
+
+const safeJson = async (res: Response): Promise<unknown> => {
+  try { return await res.json(); } catch { return null; }
+};
+
+const readJsonOrThrow = async (res: Response): Promise<unknown> => {
+  const body = await safeJson(res);
+
+  if (!res.ok) {
+    if (isApiErrorShape(body)) {
+      throw new ApiError(body);
+    }
+    throw new ApiError({
+      type: "http-error",
+      title: `HTTP ${res.status}`,
+      status: res.status,
+      detail: typeof body === "string" ? body : undefined,
+    });
+  }
+  return body;
+};
 
 /**
  * Creates a new short link for the given long URL.
  * @param {string} longUrl - The original long URL to be shortened.
- * @returns {Promise<ShortUrlResponse>} The response containing the short url details.
+ * @returns {Promise<CreateShortLinkResponse>} The response containing the short url details.
  */
-// TODO: TU
-const createShortLink = async (longUrl: string): Promise<ShortUrlResponse> => {
+const createShortLink = async (longUrl: string): Promise<CreateShortLinkResponse> => {
     const res = await fetch(`${BASE}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ longUrl })
     });
-    if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err?.message ?? `HTTP ${res.status}`);
-    }
-    return res.json();
-}
+    
+    const body = await readJsonOrThrow(res);
 
-/**
- * Gets the url details for a given slug.
- * @param {string} slug - The slug of the short link.
- * @returns {Promise<ShortUrlResponse>} The response containing the link details.
- */
-// TODO: TU
-const getLink = async (slug: string): Promise<ShortUrlResponse> => {
-    const res = await fetch(`${BASE}/${encodeURIComponent(slug)}`);
-    if (!res.ok) throw new Error(`Not found (${res.status})`);
-    return res.json();
+    if (isCreateShortLinkResponse(body)) {
+        return { data: body.data, message: body.message };
+    }
+
+    throw new ApiError({
+        type: "unexpected",
+        title: "Unexpected response from POST /",
+        status: 500,
+    });
 }
 
 /**
  * Gets all existing urls.
- * @returns {Promise<ShortUrlResponse[]>} An array of short link responses.
+ * @returns {Promise<GetAllLinksResponse>} An array of short link responses.
  */
-// TODO: TU
-const getAllLinks = async (): Promise<ShortUrlResponse[]> => {
+const getAllLinks = async (): Promise<GetAllLinksResponse> => {
     const res = await fetch(`${BASE}/links`);
-    if (!res.ok) throw new Error(`Error fetching urls (${res.status})`);
-    return res.json();
+    const body = await readJsonOrThrow(res);
+
+    if (isGetAllLinksResponse(body)) {
+        return { data: body.data, message: body.message };
+    }
+
+    throw new ApiError({
+        type: "unexpected-error",
+        title: "Unexpected response from GET /links",
+        status: 500,
+    });
 };
 
-export { createShortLink, getLink, getAllLinks };
+export { createShortLink, getAllLinks };

@@ -1,33 +1,58 @@
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createShortLink } from "../../services";
-import { ShortUrlData } from "../../interfaces";
+import { ApiError, UrlData } from "../../interfaces";
 import type { Url } from "../../schemas";
 import { urlSchema } from "../../schemas";
 
 interface UrlFormProps {
-  onSuccess: (urlData: ShortUrlData) => void;
+  onSuccess: (urlData: UrlData) => void;
 };
 
 const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
     const {
         register,
         handleSubmit,
+        setError,
         formState: { errors, isSubmitting },
         reset
     } = useForm<Url>({ resolver: zodResolver(urlSchema) });
+    const [messageValue, setMessageValue] = useState<string | null>(null);
 
     const submitLongUrl = useCallback(async (longUrl: string) => {
-        const { data } = await createShortLink(longUrl);
-        onSuccess(data);
-        reset();
+        try {
+            const { data, message } = await createShortLink(longUrl);
+            onSuccess(data);
+            setMessageValue(message);
+            reset();
+        } catch (error) {
+            if (error instanceof ApiError) {
+                if (error.status === 400) {
+                    setError("longUrl", {
+                    type: "server",
+                    message: error.detail ?? error.title,
+                    });
+                    return;
+                }
+
+                setError("root.server", {
+                    type: "server",
+                    message: error.detail ? `${error.title} — ${error.detail}` : error.title,
+                });
+                return;
+            }
+            setError("root.server", {
+                type: "unknown",
+                message: "Une erreur inattendue est survenue. Réessaie plus tard.",
+            });
+        }
     }, [onSuccess, reset]);
 
     const onFormSubmit = handleSubmit((url) => submitLongUrl(url.longUrl));
 
     return (
-        <form onSubmit={onFormSubmit} noValidate>
+        <form onSubmit={onFormSubmit}>
             <label htmlFor="longUrl" style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>
                 Url to shorten
             </label>
@@ -43,7 +68,7 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
                 }}
             />
             <div style={{ minHeight: 18, fontSize: 13, marginTop: 6, color: errors.longUrl ? "#ef4444" : "#6b7280" }}>
-                {errors.longUrl ? errors.longUrl.message : null}
+                {errors.longUrl?.message ?? messageValue}
             </div>
 
             <button

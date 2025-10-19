@@ -21,8 +21,5 @@ const urlSchema = z.object({
 
 type Url = z.infer<typeof urlSchema>;
 
-//const formSchema = z.object(urlStringSchema);
-//type FormData = z.infer<typeof formSchema>;
-
 export { urlSchema, URL_PATTERN };
 export type { Url };

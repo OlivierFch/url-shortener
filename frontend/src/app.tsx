@@ -1,30 +1,55 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { UrlForm } from "./components/url-form/url-form";
-import { ShortLinkCard } from "./components/short-link-card/short-link-card";
-import { ShortUrlData } from "./interfaces";
+import { ApiError, UrlData } from "./interfaces";
+import { getAllLinks } from "./services";
+import { UrlTable } from "./components/url-table/url-table";
+import { upsertBySlug } from "./utils/upsert-by-slug/upsert-by-slug";
 
-export default function App() {
-  const [items, setItems] = useState<ShortUrlData[]>([]);
+const App = () => {
+  const [items, setItems] = useState<UrlData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<null | string>(null);
+
+  const getExistingLinks = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data } = await getAllLinks();
+      setItems(data);
+    } catch (e: any) {
+        if (e instanceof ApiError) {
+          setError(`${e.title}${e.detail ? ` — ${e.detail}` : ""}`);
+        } else {
+          setError("Unexpected error occured");
+        }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    getExistingLinks();
+  }, [getExistingLinks]);
 
   return (
-    <div className="container">
-      <div className="panel">
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "1rem" }}>
+    <div className="url-shortener__container">
+      <div className="url-shortener__section">
+        <h1 className="url-shortener__section__title">
             URL Shortener
         </h1>
         <UrlForm
-          onSuccess={(shortUrlData) =>
-            setItems((prev) => [shortUrlData, ...prev])
+          onSuccess={(newItem) =>
+            setItems((prev) => upsertBySlug(prev, newItem))
           }
         />
+        <div className="mt-4">
+          {loading && <p>Loading…</p>}
+          {error && <p>Error : {error}</p>}
+        </div>
       </div>
-      <div className="mt-lg">
-        {items.map((it) => (
-          <div key={it.slug} className="mt">
-            <ShortLinkCard {...it} />
-          </div>
-        ))}
-      </div>
+      <UrlTable items={items} />
     </div>
   );
-}
+};
+
+export { App };
