@@ -14,7 +14,6 @@ const MAX_SLUG_GENERATION_ATTEMPTS = 5;
  * @param {string} longUrl - The long URL to shorten.
  * @returns {Promise<CreateLinkResult>} The result containing the link and whether it was already created.
  */
-// TODO: TU
 const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> => {
     for (let attempt = 1; attempt <= MAX_SLUG_GENERATION_ATTEMPTS; attempt++) {
         const slugLength = getSlugLength(attempt);
@@ -67,4 +66,4 @@ const getLinks = async (): Promise<Link[]> => {
     return links;
 };
 
-export { createSlugByLongUrl, getLinks, getUrlBySlug };
+export { createSlugByLongUrl, getLinks, getUrlBySlug, MAX_SLUG_GENERATION_ATTEMPTS };
