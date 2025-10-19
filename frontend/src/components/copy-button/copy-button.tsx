@@ -1,4 +1,5 @@
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useState } from "react";
+import "./copy-button.scss";
 
 interface CopyButtonProps {
     textToCopy: string
@@ -18,7 +19,7 @@ const CopyButton: FunctionComponent<CopyButtonProps> = ({ textToCopy }) => {
     };
 
     return (
-        <button onClick={copyToClipboard}>
+        <button className="copy-button" onClick={copyToClipboard}>
             {copied ? "Copied ✓" : "Copy"}
         </button>
     );

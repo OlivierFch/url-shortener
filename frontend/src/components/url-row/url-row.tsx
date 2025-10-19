@@ -1,5 +1,6 @@
 import { FunctionComponent } from "react";
 import { CopyButton } from "../copy-button/copy-button";
+import "./url-row.scss";
 
 type UrlRowProps = {
   shortUrl: string;
@@ -10,28 +11,28 @@ type UrlRowProps = {
 
 const UrlRow: FunctionComponent<UrlRowProps> = ({ shortUrl, slug, longUrl, hitCount }) => {
   return (
-    <tr className="url-short-card__container">
-      <td className="url-short-card__cell">{slug}</td>
+    <tr className="url-row__container">
+      <td className="url-row__cell">{slug}</td>
 
-      <td className="url-short-card__cell">
+      <td className="url-row__cell">
         <span title={longUrl}>{longUrl}</span>
       </td>
 
-      <td className="url-short-card__cell">
+      <td className="url-row__cell">
         <a
           href={shortUrl}
           target="_blank"
           rel="noreferrer"
-          className="url-short-card__short-url"
+          className="url-row__short-url"
           title={shortUrl}
         >
           {shortUrl}
         </a>
       </td>
 
-      <td className="url-short-card__cell">{hitCount}</td>
+      <td className="url-row__cell">{hitCount}</td>
 
-      <td className="url-short-card__cell">
+      <td className="url-row__cell">
         <CopyButton textToCopy={shortUrl} />
       </td>
     </tr>

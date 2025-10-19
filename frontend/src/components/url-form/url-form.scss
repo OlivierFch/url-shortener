@@ -1,0 +1,52 @@
+@use "../../styles/tokens" as *;
+
+.url-form__label {
+  display: block;
+  margin-bottom: $spacing-2;
+  font-weight: 600;
+  color: $color-accent;
+}
+
+.url-form__input {
+  width: 90%;
+  padding: $spacing-3 $spacing-4;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  background: $color-panel;
+  color: $color-text;
+  font-size: 15px;
+}
+
+.url-form__input::placeholder {
+  color: $color-text-dim;
+}
+
+.url-form__error-or-message {
+  margin-top: $spacing-2;
+  font-size: 13px;
+  color: $color-text-dim;
+}
+
+.url-form__error-or-message.is-error {
+  color: $color-danger;
+}
+
+.url-form__error-or-message.is-success {
+  color: $color-success;
+}
+
+.url-form__submit-button {
+  margin-top: $spacing-3;
+  padding: $spacing-2 $spacing-4;
+  border-radius: $radius-sm;
+  border: 1px solid $color-primary;
+  background: $color-panel;
+  color: $color-primary;
+  font-weight: 600;
+}
+
+.url-form__submit-button:hover {
+  background: $color-primary;
+  color: #fff;
+  border-color: $color-primary;
+}

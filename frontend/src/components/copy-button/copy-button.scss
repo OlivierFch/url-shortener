@@ -1,0 +1,24 @@
+@use "../../styles/tokens" as *;
+
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: $spacing-2 $spacing-3;
+  min-width: 80px;
+  font-size: 13px;
+  font-weight: 600;
+
+  background: $color-panel;
+  color: $color-primary;
+  border: 1px solid $color-primary;
+  border-radius: $radius-sm;
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  background: $color-primary;
+  color: #fff;
+  border-color: $color-primary;
+}

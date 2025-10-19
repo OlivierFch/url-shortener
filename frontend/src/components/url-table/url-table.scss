@@ -1,0 +1,37 @@
+@use "../../styles/tokens" as *;
+
+.url-table__no-result {
+  max-width: 1200px;
+  margin: $spacing-4 auto 0;
+  padding: $spacing-4;
+  text-align: center;
+  color: $color-text-dim;
+  background: $color-panel;
+  border: 1px dashed $color-border;
+  border-radius: $radius;
+}
+
+.url-table {
+  max-width: 1200px;
+  margin: $spacing-4 auto 0;
+  width: 100%;
+  background: $color-panel;
+  border: 1px solid $color-border;
+  border-radius: $radius;
+  border-collapse: collapse;
+  overflow-x: auto;
+}
+
+.url-table__header th.url-table__header__item {
+  text-align: left;
+  padding: $spacing-3 $spacing-4;
+  font-size: 13px;
+  font-weight: 700;
+  color: $color-accent-dark;
+  background: $color-tint-header;
+  border-bottom: 1px solid $color-border;
+}
+
+.url-table__header th.url-table__header__item:last-child {
+  text-align: right;
+}

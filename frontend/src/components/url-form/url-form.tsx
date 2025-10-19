@@ -5,6 +5,7 @@ import { createShortLink } from "../../services";
 import { ApiError, UrlData } from "../../interfaces";
 import type { Url } from "../../schemas";
 import { urlSchema } from "../../schemas";
+import "./url-form.scss";
 
 interface UrlFormProps {
   onSuccess: (urlData: UrlData) => void;
@@ -19,6 +20,18 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
         reset
     } = useForm<Url>({ resolver: zodResolver(urlSchema) });
     const [messageValue, setMessageValue] = useState<string | null>(null);
+
+    const errorMsg = errors.longUrl?.message as string | undefined;
+    const successMsg = !errorMsg && messageValue ? String(messageValue) : undefined;
+
+    const feedbackText = errorMsg ?? successMsg ?? "";
+
+    let feedbackClass = "url-form__error-or-message";
+    if (errorMsg) {
+    feedbackClass += " is-error";
+    } else if (successMsg) {
+    feedbackClass += " is-success";
+    }
 
     const submitLongUrl = useCallback(async (longUrl: string) => {
         try {
@@ -52,32 +65,23 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
     const onFormSubmit = handleSubmit((url) => submitLongUrl(url.longUrl));
 
     return (
-        <form onSubmit={onFormSubmit}>
-            <label htmlFor="longUrl" style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>
+        <form onSubmit={onFormSubmit} className="url-form">
+            <label htmlFor="longUrl" className="url-form__label">
                 Url to shorten
             </label>
             <input
                 id="longUrl"
                 {...register("longUrl")}
                 placeholder="https://exemple.com/article..."
-                spellCheck={false}
-                autoComplete="off"
-                style={{
-                width: "100%", padding: "10px 12px", borderRadius: 8,
-                border: "1px solid #ccc", outline: "none"
-                }}
+                className="url-form__input"
             />
-            <div style={{ minHeight: 18, fontSize: 13, marginTop: 6, color: errors.longUrl ? "#ef4444" : "#6b7280" }}>
-                {errors.longUrl?.message ?? messageValue}
+            <div className={feedbackClass} role="status" aria-live="polite">
+                {feedbackText}
             </div>
-
             <button
                 type="submit"
                 disabled={isSubmitting}
-                style={{
-                    marginTop: 12, padding: "10px 14px", borderRadius: 8,
-                    border: "none", cursor: "pointer", background: "#60a5fa", color: "#0b1020", fontWeight: 700
-                }}
+                className="url-form__submit-button"
             >
                 {isSubmitting ? "Loading" : "Shorten"}
             </button>

@@ -1,0 +1,32 @@
+$font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial;
+
+$radius: 8px;
+$radius-sm: 6px;
+
+$spacing-1: 4px;
+$spacing-2: 8px;
+$spacing-3: 12px;
+$spacing-4: 16px;
+$spacing-5: 20px;
+$spacing-6: 24px;
+
+/* Neutral colors */
+$color-bg: #ffffff;
+$color-panel: #ffffff;
+$color-border: #e6e6eb;
+$color-text: #1b1b1f;
+$color-text-dim: #6e6e76;
+
+/* Main colors */
+$color-primary: #1362dd;
+$color-accent:  #3c1441;
+$color-accent-dark: #320a37;
+
+/* Tinted colors */
+$color-tint-header: #f3eff7;
+$color-tint-row-alt: #faf7fb;
+$color-tint-hover:   #eef4ff;
+
+/* Status colors */
+$color-success: #16a34a;
+$color-danger:  #dc2626;

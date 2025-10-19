@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import { UrlData } from "../../interfaces";
 import { UrlRow } from "../url-row/url-row";
+import "./url-table.scss";
 
 interface UrlTableProps {
     items: UrlData[];
@@ -11,7 +12,7 @@ const generateUrlShortTableRow = (item: UrlData) => {
 };
 
 const UrlTable: FunctionComponent<UrlTableProps> = ({ items }) => {
-    if (!items.length) return (<div>No links for the moment</div>);
+    if (!items.length) return (<div className="url-table__no-result">No links for the moment</div>);
 
     return (
         <table className="url-table">

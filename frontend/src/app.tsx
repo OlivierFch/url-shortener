@@ -4,6 +4,7 @@ import { ApiError, UrlData } from "./interfaces";
 import { getAllLinks } from "./services";
 import { UrlTable } from "./components/url-table/url-table";
 import { upsertBySlug } from "./utils/upsert-by-slug/upsert-by-slug";
+import "./app.scss";
 
 const App = () => {
   const [items, setItems] = useState<UrlData[]>([]);
@@ -42,7 +43,7 @@ const App = () => {
             setItems((prev) => upsertBySlug(prev, newItem))
           }
         />
-        <div className="mt-4">
+        <div className="url-shortener__loading-error-section">
           {loading && <p>Loading…</p>}
           {error && <p>Error : {error}</p>}
         </div>

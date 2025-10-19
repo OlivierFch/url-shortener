@@ -1,0 +1,40 @@
+@use "../../styles/tokens" as *;
+
+.url-row__container {
+  background: transparent;
+}
+
+.url-row__container:nth-child(2n) {
+  background: $color-tint-row-alt;
+}
+
+.url-row__cell {
+  padding: $spacing-3 $spacing-4;
+  border-bottom: 1px solid $color-border;
+  font-size: 14px;
+}
+
+.url-row__cell:last-child {
+  text-align: right;
+}
+
+.url-row__cell span[title] {
+  display: inline-block;
+  max-width: 520px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.url-row__short-url {
+  color: $color-primary;
+  text-decoration: none;
+}
+
+.url-row__container:hover .url-row__short-url {
+  text-decoration: underline;
+}
+
+.url-row__container:hover {
+  background: $color-tint-hover;
+}
