@@ -45,7 +45,7 @@ Accessing that link automatically redirects to the original URL via an HTTP 302 
 ## ⚙️ Prerequisites
 
 - Node.js **>= 18**
-- npm (or pnpm)
+- npm
 - Docker + Docker Compose
 
 <br>
