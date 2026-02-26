@@ -66,10 +66,15 @@ Login credentials (defined in `docker-compose.yml`):
 Email: admin@example.com
 Password: admin
 ```
+## 🏗️ Initialize project
+Initialize environment variables in folders `/backend` and `/frontend`:
+```bash
+cp .env.example .env
+```
+
 Then initialize Prisma
 ```bash
 cd backend
-cp .env.example .env
 npm install
 npm run prisma:migrate
 npm run prisma:generate
