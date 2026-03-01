@@ -7,7 +7,7 @@ const validateParams = <T>(schema: ZodSchema<T>): RequestHandler => {
         const { success, error, data } = schema.safeParse(req.params);
         if (!success) return sendError(res, 400, "bad-request", "Bad Request");
 
-        (req as any).params = data;
+        res.locals.params = data;
         next();
     };
 };

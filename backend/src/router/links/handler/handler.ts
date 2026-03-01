@@ -51,12 +51,15 @@ const redirectUrl = async (req: Request, res: Response) => {
  * @param {Request} req - Request object.
  * @param {Response} res - Response object to send the result.
  */
-const getAllLinks = async (req: Request, res: Response) => {
+const getAllLinks = async (_req: Request, res: Response) => {
     try {
-        const links = await getLinks();
+        const links = await getLinks(res.locals.query);
         return res.status(200).send({ message: "Links retrieved successfully", data: links.map((link) => toUrlResponse(link)) });
-    } catch (error) {
-        return sendError(res, 500, "internal-server-error", "Internal server error");
+    } catch (error: any) {
+        if (typeof error?.message === "string" && error.message.includes("Invalid filter value")) {
+            return sendError(res, 400, "invalid-request", error.message);
+        }
+        return sendError(res, 500, "internal-server-error", `Internal server error: ${error}`);
     }
 };
 

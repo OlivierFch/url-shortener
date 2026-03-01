@@ -4,6 +4,7 @@ import { CreateLinkResult } from "../interfaces/index.ts";
 import { Prisma } from "@prisma/client";
 import type { Link } from "@prisma/client";
 import { getSlugLength } from "../utils/get-slug-length/get-slug-length.ts";
+import { GetLinksQueryParams } from "../router/links/schema/index.ts";
 
 const MAX_SLUG_GENERATION_ATTEMPTS = 5;
 
@@ -58,11 +59,11 @@ const getUrlBySlug = async (slug: string): Promise<Link | null> => {
 };
 
 /**
- * Gets all existing links.
+ * Gets all existing links according to filters.
  * @returns {Promise<Link[]>} An array of Link objects.
  */
-const getLinks = async (): Promise<Link[]> => {
-    const links = await findAllLinks();
+const getLinks = async (filter?: GetLinksQueryParams): Promise<Link[]> => {
+    const links = await findAllLinks(filter);
     return links;
 };
 
