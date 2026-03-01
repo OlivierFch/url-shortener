@@ -1,42 +1,51 @@
-import { useCallback, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { UrlForm } from "./components/url-form/url-form";
 import { ApiError, UrlData } from "./interfaces";
-import { getAllLinks } from "./services";
+import { getAllLinks, GetAllLinksOptions } from "./services";
 import { UrlTable } from "./components/url-table/url-table";
 import { upsertBySlug } from "./utils/upsert-by-slug/upsert-by-slug";
+import { SearchInput } from "./components/search-input/search-input";
+import { useDebounce } from "./hooks/use-debounce";
 import "./app.scss";
 
 const App = () => {
   const [items, setItems] = useState<UrlData[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [hitCountSort, setHitCountSort] = useState<"asc" | "desc">("desc");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  const getExistingLinks = useCallback(async () => {
-    setLoading(true);
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const getExistingLinks = useCallback(async (options: GetAllLinksOptions) => {
     setError(null);
     try {
-      const { data } = await getAllLinks();
+      const { data } = await getAllLinks(options);
       setItems(data);
     } catch (e: any) {
-        if (e instanceof ApiError) {
-          setError(`${e.title}${e.detail ? ` — ${e.detail}` : ""}`);
-        } else {
-          setError("Unexpected error occured");
-        }
-    } finally {
-      setLoading(false);
+      if (e instanceof ApiError) {
+        setError(`${e.title}${e.detail ? ` — ${e.detail}` : ""}`);
+      } else {
+        setError("Unexpected error occured");
+      }
     }
   }, []);
 
+  const handleHitCountSort = useCallback(() => {
+    setHitCountSort((prev) => (prev === "desc" ? "asc" : "desc"));
+  }, []);
+
   useEffect(() => {
-    getExistingLinks();
-  }, [getExistingLinks]);
+    getExistingLinks({ q: debouncedSearchTerm, hitCount: hitCountSort });
+  }, [debouncedSearchTerm, getExistingLinks, hitCountSort]);
 
   return (
     <div className="url-shortener__container">
       <div className="url-shortener__section">
         <h1 className="url-shortener__section__title">
-            URL Shortener
+          URL Shortener
         </h1>
         <UrlForm
           onSuccess={(newItem) =>
@@ -44,11 +53,13 @@ const App = () => {
           }
         />
         <div className="url-shortener__loading-error-section">
-          {loading && <p>Loading…</p>}
           {error && <p>Error : {error}</p>}
         </div>
       </div>
-      <UrlTable items={items} />
+      <div className="url-shortener__section__table">
+        <SearchInput value={searchTerm} onChange={handleSearchChange} />
+        <UrlTable items={items} onHitCountSort={handleHitCountSort} />
+      </div>
     </div>
   );
 };

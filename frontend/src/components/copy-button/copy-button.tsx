@@ -2,7 +2,7 @@ import { FunctionComponent, useState } from "react";
 import "./copy-button.scss";
 
 interface CopyButtonProps {
-    textToCopy: string
+    textToCopy: string;
 }
 
 const CopyButton: FunctionComponent<CopyButtonProps> = ({ textToCopy }) => {

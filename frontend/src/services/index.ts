@@ -31,42 +31,52 @@ const readJsonOrThrow = async (res: Response): Promise<unknown> => {
  * @returns {Promise<CreateShortLinkResponse>} The response containing the short url details.
  */
 const createShortLink = async (longUrl: string): Promise<CreateShortLinkResponse> => {
-    const res = await fetch(`${BASE}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ longUrl })
-    });
-    
-    const body = await readJsonOrThrow(res);
+  const res = await fetch(`${BASE}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ longUrl })
+  });
 
-    if (isCreateShortLinkResponse(body)) {
-        return { data: body.data, message: body.message };
-    }
+  const body = await readJsonOrThrow(res);
 
-    throw new ApiError({
-        type: "unexpected",
-        title: "Unexpected response from POST /",
-        status: 500,
-    });
+  if (isCreateShortLinkResponse(body)) {
+    return { data: body.data, message: body.message };
+  }
+
+  throw new ApiError({
+    type: "unexpected",
+    title: "Unexpected response from POST /",
+    status: 500,
+  });
 }
 
+type GetAllLinksOptions = {
+  hitCount?: "asc" | "desc";
+  q?: string;
+};
+
 /**
- * Gets all existing urls.
+ * Gets all existing urls with optional ordering.
  * @returns {Promise<GetAllLinksResponse>} An array of short link responses.
  */
-const getAllLinks = async (): Promise<GetAllLinksResponse> => {
-    const res = await fetch(`${BASE}/links`);
-    const body = await readJsonOrThrow(res);
+const getAllLinks = async (options: GetAllLinksOptions = {}): Promise<GetAllLinksResponse> => {
+  const params = new URLSearchParams();
+  if (options.hitCount) params.set("hitCount", options.hitCount);
+  if (options.q) params.set("q", options.q);
+  const query = params.toString();
+  const res = await fetch(`${BASE}/links${query ? `?${query}` : ""}`);
+  const body = await readJsonOrThrow(res);
 
-    if (isGetAllLinksResponse(body)) {
-        return { data: body.data, message: body.message };
-    }
+  if (isGetAllLinksResponse(body)) {
+    return { data: body.data, message: body.message };
+  }
 
-    throw new ApiError({
-        type: "unexpected-error",
-        title: "Unexpected response from GET /links",
-        status: 500,
-    });
+  throw new ApiError({
+    type: "unexpected-error",
+    title: "Unexpected response from GET /links",
+    status: 500,
+  });
 };
 
 export { createShortLink, getAllLinks };
+export type { GetAllLinksOptions };

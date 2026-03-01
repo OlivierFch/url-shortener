@@ -2,13 +2,13 @@ import { ApiErrorShape, CreateShortLinkResponse, GetAllLinksResponse, UrlData } 
 
 // Checks that we receive a simple object (no null, array, etc...)
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 };
 
 // Checks API error type that should be returned by the backend
 const isApiErrorShape = (value: unknown): value is ApiErrorShape => {
   if (!isPlainObject(value)) return false;
-  
+
   const { type, title, status } = value;
 
   const hasType = typeof type === "string";
@@ -40,7 +40,7 @@ const isUrlDataArray = (value: unknown): value is UrlData[] =>
 // Checks API POST response when a short url is created
 const isCreateShortLinkResponse = (value: unknown): value is CreateShortLinkResponse => {
   if (!isPlainObject(value)) return false;
-  
+
   const hasMessage = typeof value.message === "string";
   const hasValidData = isUrlData(value.data);
 
@@ -50,7 +50,7 @@ const isCreateShortLinkResponse = (value: unknown): value is CreateShortLinkResp
 // Checks API GET response when short urls are fetched
 const isGetAllLinksResponse = (value: unknown): value is GetAllLinksResponse => {
   if (!isPlainObject(value)) return false;
-  
+
   const hasMessage = typeof value.message === "string";
   const hasValidDataArray = isUrlDataArray(value.data);
 
