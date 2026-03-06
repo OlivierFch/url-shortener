@@ -1,6 +1,6 @@
 import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.ts";
 import { generateSlug } from "../utils/generate-slug/generate-slug.ts";
-import { CreateLinkResult } from "../interfaces/index.ts";
+import { CreateLinkResult, ServiceError } from "../interfaces/index.ts";
 import { Prisma } from "@prisma/client";
 import type { Link } from "@prisma/client";
 import { getSlugLength } from "../utils/get-slug-length/get-slug-length.ts";
@@ -23,21 +23,32 @@ const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> =
         try {
             const createdLink = await createSlug({ longUrl: longUrl, slug });
             return { isAlreadyCreated: false, link: createdLink };
-        } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError) {
-                // Prisma known error code for unique constraint violation
-                if (error?.code === "P2002") {
+        } catch (error: any) {
+            // Prisma known error code for unique constraint violation
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+                const metaTarget = error.meta?.target;
+                const target: string[] = Array.isArray(metaTarget) ? metaTarget.filter((mTarget): mTarget is string => typeof mTarget === "string") : [];
+
+                const isConflictOnLongUrl = target.includes("longUrl");
+                const isConflictOnSlug = target.includes("slug");
+
+                if (isConflictOnLongUrl) {
                     const existingLongUrl = await findByLongUrl(longUrl);
                     if (existingLongUrl) return { isAlreadyCreated: true, link: existingLongUrl };
 
+                    throw new ServiceError(500, "longurl-conflict", "Long URL conflict detected but not found.");
+                }
+
+                if (isConflictOnSlug || !isConflictOnLongUrl) {
                     if (attempt === MAX_SLUG_GENERATION_ATTEMPTS) {
-                        throw new Error("Unable to generate a unique slug after several attempts.");
+                        throw new ServiceError(409, "slug-collision", "Unable to generate a unique slug after several attempts.");
                     }
                     continue; // Try again with a new slug
                 }
             }
             // Throw other errors
-            throw error;
+            const message = error instanceof Error ? error.message : String(error);
+            throw new ServiceError(500, "service-error", `createSlugByLongUrl failed: ${message}`);
         }
     }
 
