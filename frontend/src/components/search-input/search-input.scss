@@ -1,0 +1,23 @@
+@use "../../styles/tokens" as *;
+
+.search-input__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-1;
+    width: fit-content;
+}
+
+.search-input__label {
+    font-weight: 600;
+    color: $color-accent;
+}
+
+.search-input {
+    padding: $spacing-3 $spacing-4;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    background: $color-panel;
+    color: $color-text;
+    font-size: 15px;
+    width: 150px;
+}

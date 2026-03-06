@@ -8,7 +8,7 @@ import { urlSchema } from "../../schemas";
 import "./url-form.scss";
 
 interface UrlFormProps {
-  onSuccess: (urlData: UrlData) => void;
+    onSuccess: (urlData: UrlData) => void;
 };
 
 const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
@@ -28,9 +28,9 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
 
     let feedbackClass = "url-form__error-or-message";
     if (errorMsg) {
-    feedbackClass += " is-error";
+        feedbackClass += " is-error";
     } else if (successMsg) {
-    feedbackClass += " is-success";
+        feedbackClass += " is-success";
     }
 
     const submitLongUrl = useCallback(async (longUrl: string) => {
@@ -43,8 +43,8 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
             if (error instanceof ApiError) {
                 if (error.status === 400) {
                     setError("longUrl", {
-                    type: "server",
-                    message: error.detail ?? error.title,
+                        type: "server",
+                        message: error.detail ?? error.title,
                     });
                     return;
                 }
@@ -66,9 +66,6 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
 
     return (
         <form onSubmit={onFormSubmit} className="url-form">
-            <label htmlFor="longUrl" className="url-form__label">
-                Url to shorten
-            </label>
             <input
                 id="longUrl"
                 {...register("longUrl")}

@@ -74,6 +74,7 @@ describe("Unit tests for links service", () => {
 
         test("createSlugByLongUrl should return an existing slug when there is a collision (P2002) on 'longUrl'", async () => {
             const prismaError = new (Prisma as any).PrismaClientKnownRequestError("Unique constraint failed", "P2002");
+            (prismaError as any).meta = { target: ["longUrl"] };
 
             mockedCreateSlug.mockRejectedValue(prismaError);
             const existingLink = createLink();
@@ -85,46 +86,46 @@ describe("Unit tests for links service", () => {
 
         test("createSlugByLongUrl should retry and success when there is a collision (P2002) on 'slug' with no existing 'longUrl'", async () => {
             const prismaError = new (Prisma as any).PrismaClientKnownRequestError("Unique constraint failed", "P2002");
+            (prismaError as any).meta = { target: ["slug"] };
             const created = createLink();
 
             mockedCreateSlug
                 .mockRejectedValueOnce(prismaError) // First try -> Collision "P2002"
                 .mockResolvedValueOnce(created); // Second try -> Success
 
-            mockedFindByLongUrl.mockResolvedValueOnce(null);
-
             const result = await createSlugByLongUrl(longUrl);
 
             expect(mockedCreateSlug).toHaveBeenCalledTimes(2);
             expect(result).toStrictEqual({ isAlreadyCreated: false, link: created });
+            expect(mockedFindByLongUrl).not.toHaveBeenCalled();
         });
 
         test("createSlugByLongUrl should throw an error after we reach all attempts possible due to collision 'P2002' on 'slug'", async () => {
             const prismaError = new (Prisma as any).PrismaClientKnownRequestError("Unique constraint failed", "P2002");
+            (prismaError as any).meta = { target: ["slug"] };
 
             for (let i = 0; i < MAX_SLUG_GENERATION_ATTEMPTS; i++) {
                 mockedCreateSlug.mockRejectedValueOnce(prismaError);
-                mockedFindByLongUrl.mockResolvedValueOnce(null);
             }
 
             await expect(createSlugByLongUrl(longUrl)).rejects.toThrow("Unable to generate a unique slug after several attempts.");
             expect(mockedCreateSlug).toHaveBeenCalledTimes(MAX_SLUG_GENERATION_ATTEMPTS);
-            expect(mockedFindByLongUrl).toHaveBeenCalledTimes(MAX_SLUG_GENERATION_ATTEMPTS);
-        });
-
-        test("createSlugByLongUrl should retry if a Prisma error different from 'P2002' is detected", async () => {
-            const prismaError = new (Prisma as any).PrismaClientKnownRequestError("Value stored in database is invalid for the field's type", "P2005");
-            mockedCreateSlug.mockRejectedValueOnce(prismaError);
-
-            await expect(createSlugByLongUrl(longUrl)).rejects.toThrow(prismaError);
             expect(mockedFindByLongUrl).not.toHaveBeenCalled();
         });
 
-        test("createSlugByLongUrl should retry when it detects a non-Prisma error", async () => {
+        test("createSlugByLongUrl should throw ServiceError if a Prisma error different from 'P2002' is detected", async () => {
+            const prismaError = new (Prisma as any).PrismaClientKnownRequestError("Value stored in database is invalid for the field's type", "P2005");
+            mockedCreateSlug.mockRejectedValueOnce(prismaError);
+
+            await expect(createSlugByLongUrl(longUrl)).rejects.toThrow("createSlugByLongUrl failed: Value stored in database is invalid for the field's type");
+            expect(mockedFindByLongUrl).not.toHaveBeenCalled();
+        });
+
+        test("createSlugByLongUrl should throw ServiceError when it detects a non-Prisma error", async () => {
             const error = new Error("DB down");
             mockedCreateSlug.mockRejectedValueOnce(error);
 
-            await expect(createSlugByLongUrl(longUrl)).rejects.toThrow("DB down");
+            await expect(createSlugByLongUrl(longUrl)).rejects.toThrow("createSlugByLongUrl failed: DB down");
             expect(mockedFindByLongUrl).not.toHaveBeenCalled();
         });
     });
