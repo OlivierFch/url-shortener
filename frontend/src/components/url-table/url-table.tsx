@@ -32,6 +32,13 @@ const UrlTable: FunctionComponent<UrlTableProps> = ({ items, onHitCountSort }) =
 
     return (
         <table className="url-table">
+            <colgroup className="url-table__colgroup">
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+            </colgroup>
             <thead className="url-table__header">
                 <tr>
                     <UrlTableHeader title="Slug" />

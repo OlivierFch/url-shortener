@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSlug, redirectUrl, getAllLinks } from "./handler/handler.ts";
+import { createSlug, redirectUrl, getAllLinks, getTopLinks, getCategories } from "./handler/handler.ts";
 import { validateBody } from "../middlewares/validate-body/validate-body.ts";
 import { CreateSlugSchema, RedirectUrlSchema, GetLinksQueryParamsSchema } from "./schema/index.ts";
 import { validateParams } from "../middlewares/validate-param/validate-params.ts";
@@ -10,6 +10,8 @@ import { validateQuery } from "../middlewares/validate-query/validate-query.ts";
 const linksRouter = Router();
 
 linksRouter.post("/", validateBody(CreateSlugSchema), validateLongUrlBody, createSlug);
+linksRouter.get("/links/top", getTopLinks);
+linksRouter.get("/categories", getCategories);
 linksRouter.get("/links", validateQuery(GetLinksQueryParamsSchema), getAllLinks);
 linksRouter.get("/:slug", validateParams(RedirectUrlSchema), validateSlugParam, redirectUrl);
 

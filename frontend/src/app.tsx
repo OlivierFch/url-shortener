@@ -6,6 +6,7 @@ import { UrlTable } from "./components/url-table/url-table";
 import { upsertBySlug } from "./utils/upsert-by-slug/upsert-by-slug";
 import { SearchInput } from "./components/search-input/search-input";
 import { useDebounce } from "./hooks/use-debounce";
+import { TopUrls } from "./components/top-urls/top-urls";
 import "./app.scss";
 
 const App = () => {
@@ -43,23 +44,30 @@ const App = () => {
 
   return (
     <div className="url-shortener__container">
-      <div className="url-shortener__section">
-        <h1 className="url-shortener__section__title">
-          URL Shortener
-        </h1>
-        <UrlForm
-          onSuccess={(newItem) =>
-            setItems((prev) => upsertBySlug(prev, newItem))
-          }
-        />
-        <div className="url-shortener__loading-error-section">
-          {error && <p>Error : {error}</p>}
-        </div>
+      <div className="url-shortener__container__top">
+        <section className="url-shortener__section url-shortener__section--form">
+          <div>
+            <h1 className="url-shortener__section__title">
+              URL Shortener
+            </h1>
+            <UrlForm
+              onSuccess={(newItem) =>
+                setItems((prev) => upsertBySlug(prev, newItem))
+              }
+            />
+            <div className="url-shortener__loading-error-section">
+              {error && <p>Error : {error}</p>}
+            </div>
+          </div>
+        </section>
+        <section>
+          <TopUrls />
+        </section>
       </div>
-      <div className="url-shortener__section__table">
+      <section className="url-shortener__section url-shortener__section--table">
         <SearchInput value={searchTerm} onChange={handleSearchChange} />
         <UrlTable items={items} onHitCountSort={handleHitCountSort} />
-      </div>
+      </section>
     </div>
   );
 };

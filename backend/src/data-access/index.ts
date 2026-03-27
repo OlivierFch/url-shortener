@@ -4,8 +4,8 @@ import { GetLinksQueryParams } from "../router/links/schema/index.ts";
 
 export const prisma = new PrismaClient();
 
-const createSlug = async ({ longUrl, slug }: { longUrl: string, slug: string }): Promise<Link> => {
-    const result = await prisma.link.create({ data: { longUrl, slug } });
+const createSlug = async ({ longUrl, slug, category }: { longUrl: string, slug: string, category?: string | null }): Promise<Link> => {
+    const result = await prisma.link.create({ data: { longUrl, slug, category } });
     return result;
 };
 
@@ -56,4 +56,27 @@ const findAllLinks = async (filter?: GetLinksQueryParams): Promise<Link[]> => {
     return result;
 };
 
-export { createSlug, findAllLinks, findBySlug, findByLongUrl, incrementHitCount };
+const recordVisit = async (linkId: string): Promise<void> => {
+    await prisma.visit.create({ data: { linkId } });
+};
+
+type VisitCountByLink = { linkId: string; visits: number };
+
+const getVisitCountsByLink = async (start: Date, end: Date): Promise<VisitCountByLink[]> => {
+    const grouped = await prisma.visit.groupBy({
+        by: ["linkId"],
+        _count: { linkId: true },
+        where: { createdAt: { gte: start, lt: end } },
+        orderBy: { _count: { linkId: "desc" } }
+    });
+    return grouped.map((item) => ({ linkId: item.linkId, visits: item._count.linkId }));
+};
+
+const findLinksByIds = async (ids: string[]): Promise<Link[]> => {
+    if (!ids.length) return [];
+    const result = await prisma.link.findMany({ where: { id: { in: ids } } });
+    return result;
+};
+
+export { createSlug, findAllLinks, findBySlug, findByLongUrl, incrementHitCount, recordVisit, getVisitCountsByLink, findLinksByIds };
+export type { VisitCountByLink };

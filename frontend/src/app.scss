@@ -11,12 +11,37 @@
   padding: $spacing-6 $spacing-4;
 }
 
+.url-shortener__container__top {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+  width: 100%;
+}
+
 .url-shortener__section {
-  width: 800px;
+  width: min(100%, 1200px);
   background: $color-panel;
   border: 1px solid $color-border;
   border-radius: $radius;
   padding: $spacing-6;
+  box-sizing: border-box;
+}
+
+.url-shortener__section--form,
+.url-shortener__section--table {
+  width: 100%;
+}
+
+.url-shortener__section--form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.url-shortener__section--table {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
 }
 
 .url-shortener__section__title {
@@ -36,9 +61,8 @@
   }
 }
 
-.url-shortener__section__table {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  gap: $spacing-4;
+@media (max-width: 960px) {
+  .url-shortener__section {
+    width: 100%;
+  }
 }

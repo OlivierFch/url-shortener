@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import { createSlugByLongUrl, getLinks, getUrlBySlug } from "../../../service/index.ts";
+import { CalendarWindow, createSlugByLongUrl, getLinks, getTopLinksForWindow, getUrlBySlug } from "../../../service/index.ts";
+import { getCategories as getCategoriesList } from "../../../service/categories.ts";
 import { toUrlResponse } from "../../../utils/to-url-response/to-url-response.ts";
 import { sendError } from "../../../utils/send-error/send-error.ts";
+import { env } from "../../../env.ts";
 
 /**
  * Creates a new slug for a given long URL (idempotent).
@@ -10,16 +12,16 @@ import { sendError } from "../../../utils/send-error/send-error.ts";
  */
 const createSlug = async (req: Request, res: Response) => {
     try {
-        const { longUrl } = req.body;
+        const { longUrl, category } = req.body;
 
-        const response = await createSlugByLongUrl(longUrl);
+        const response = await createSlugByLongUrl(longUrl, category ?? undefined);
         const { isAlreadyCreated, link } = response;
 
         return res
             .status(isAlreadyCreated ? 200 : 201)
             .send({
                 message: isAlreadyCreated ? "Slug already created" : "New slug created",
-                data: toUrlResponse(link)
+                data: toUrlResponse(link, env.BASE_URL)
             });
     } catch (error: any) {
         if (error?.name === "ZodError") {
@@ -54,7 +56,7 @@ const redirectUrl = async (req: Request, res: Response) => {
 const getAllLinks = async (_req: Request, res: Response) => {
     try {
         const links = await getLinks(res.locals.query);
-        return res.status(200).send({ message: "Links retrieved successfully", data: links.map((link) => toUrlResponse(link)) });
+        return res.status(200).send({ message: "Links retrieved successfully", data: links.map((link) => toUrlResponse(link, env.BASE_URL)) });
     } catch (error: any) {
         if (typeof error?.message === "string" && error.message.includes("Invalid filter value")) {
             return sendError(res, 400, "invalid-request", error.message);
@@ -63,4 +65,23 @@ const getAllLinks = async (_req: Request, res: Response) => {
     }
 };
 
-export { createSlug, getAllLinks, redirectUrl };
+const getTopLinks = async (req: Request, res: Response) => {
+    try {
+        const requestedWindow: CalendarWindow = req.query.window === "current" ? "current" : "previous";
+        const summary = await getTopLinksForWindow(requestedWindow);
+        return res.status(200).send({ message: "Top links retrieved successfully", data: summary });
+    } catch (error: any) {
+        return sendError(res, 500, "internal-server-error", `Internal server error: ${error}`);
+    }
+};
+
+const getCategories = async (_req: Request, res: Response) => {
+    try {
+        const categories = getCategoriesList();
+        return res.status(200).send({ message: "Categories retrieved successfully", data: categories });
+    } catch (error: any) {
+        return sendError(res, 500, "internal-server-error", `Internal server error: ${error}`);
+    }
+};
+
+export { createSlug, getAllLinks, getTopLinks, getCategories, redirectUrl };

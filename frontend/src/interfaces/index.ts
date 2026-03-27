@@ -3,6 +3,7 @@ interface UrlData {
     shortUrl: string;
     longUrl: string;
     hitCount: number;
+    category?: string | null;
 }
 
 interface CreateShortLinkResponse {
@@ -22,6 +23,42 @@ interface ApiErrorShape {
     detail?: string;
 }
 
+interface CategoryOption {
+    value: string;
+    label: string;
+}
+
+interface CategoriesResponse {
+    message: string;
+    data: CategoryOption[];
+}
+
+interface TopUrlItem {
+    slug: string;
+    longUrl: string;
+    shortUrl: string;
+    monthlyHits: number;
+    category?: string | null;
+}
+
+type TopLinksWindow = "previous" | "current";
+
+interface TopLinksCategory {
+    category: string | null;
+    categoryLabel: string;
+    links: TopUrlItem[];
+}
+
+interface TopLinksResponse {
+    message: string;
+    data: {
+        periodStart: string;
+        periodEnd: string;
+        window: TopLinksWindow;
+        categories: TopLinksCategory[];
+    };
+}
+
 class ApiError extends Error {
     readonly type: string;
     readonly status: number;
@@ -38,5 +75,5 @@ class ApiError extends Error {
     }
 }
 
-export type { UrlData, CreateShortLinkResponse, GetAllLinksResponse, ApiErrorShape };
+export type { UrlData, CreateShortLinkResponse, GetAllLinksResponse, ApiErrorShape, TopLinksResponse, TopLinksCategory, TopUrlItem, TopLinksWindow, CategoryOption, CategoriesResponse };
 export { ApiError };

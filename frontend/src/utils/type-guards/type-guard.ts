@@ -1,4 +1,4 @@
-import { ApiErrorShape, CreateShortLinkResponse, GetAllLinksResponse, UrlData } from "../../interfaces";
+import { ApiErrorShape, CreateShortLinkResponse, GetAllLinksResponse, TopLinksCategory, TopLinksResponse, TopLinksWindow, TopUrlItem, UrlData, CategoryOption, CategoriesResponse } from "../../interfaces";
 
 // Checks that we receive a simple object (no null, array, etc...)
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
@@ -57,4 +57,65 @@ const isGetAllLinksResponse = (value: unknown): value is GetAllLinksResponse => 
   return hasMessage && hasValidDataArray;
 };
 
-export { isApiErrorShape, isCreateShortLinkResponse, isGetAllLinksResponse };
+const isTopUrlItem = (value: unknown): value is TopUrlItem => {
+  if (!isPlainObject(value)) return false;
+
+  const { slug, longUrl, shortUrl, monthlyHits, category } = value;
+
+  const hasSlug = typeof slug === "string";
+  const hasLongUrl = typeof longUrl === "string";
+  const hasShortUrl = typeof shortUrl === "string";
+  const hasMonthlyHits = typeof monthlyHits === "number";
+  const hasValidCategory = category === undefined || category === null || typeof category === "string";
+
+  return hasSlug && hasLongUrl && hasShortUrl && hasMonthlyHits && hasValidCategory;
+};
+
+const isTopLinksCategory = (value: unknown): value is TopLinksCategory => {
+  if (!isPlainObject(value)) return false;
+
+  const { category, categoryLabel, links } = value;
+
+  const hasCategoryLabel = typeof categoryLabel === "string";
+  const hasValidCategory = category === null || typeof category === "string";
+  const hasLinks = Array.isArray(links) && links.every(isTopUrlItem);
+
+  return hasCategoryLabel && hasValidCategory && hasLinks;
+};
+
+const isGetTopLinksResponse = (value: unknown): value is TopLinksResponse => {
+  if (!isPlainObject(value)) return false;
+
+  const { message, data } = value;
+  if (typeof message !== "string" || !isPlainObject(data)) return false;
+
+  const { periodStart, periodEnd, categories, window } = data;
+  const hasPeriodStart = typeof periodStart === "string";
+  const hasPeriodEnd = typeof periodEnd === "string";
+  const hasCategories = Array.isArray(categories) && categories.every(isTopLinksCategory);
+  const hasWindow = window === "previous" || window === "current";
+
+  return hasPeriodStart && hasPeriodEnd && hasCategories && hasWindow;
+};
+
+const isCategoryOption = (value: unknown): value is CategoryOption => {
+  if (!isPlainObject(value)) return false;
+
+  const { value: categoryValue, label } = value;
+  const hasValue = typeof categoryValue === "string";
+  const hasLabel = typeof label === "string";
+
+  return hasValue && hasLabel;
+};
+
+const isCategoriesResponse = (value: unknown): value is CategoriesResponse => {
+  if (!isPlainObject(value)) return false;
+
+  const { message, data } = value;
+  const hasMessage = typeof message === "string";
+  const hasData = Array.isArray(data) && data.every(isCategoryOption);
+
+  return hasMessage && hasData;
+};
+
+export { isApiErrorShape, isCreateShortLinkResponse, isGetAllLinksResponse, isGetTopLinksResponse, isCategoriesResponse };

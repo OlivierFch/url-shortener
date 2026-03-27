@@ -16,7 +16,12 @@ const urlSchema = z.object({
     .min(1, "L'URL est requise")
     .refine((url: string) => URL_PATTERN.test(url), "Format d'URL invalide")
     .transform((url: string) => (url.startsWith(httpBase) || url.startsWith(httpsBase) ? url : `${httpsBase}${url}`))
-    .pipe(z.string().url("URL invalide"))
+    .pipe(z.string().url("URL invalide")),
+  category: z.string()
+    .trim()
+    .max(32, "La catégorie doit faire au plus 32 caractères")
+    .transform((value) => (value.length ? value : undefined))
+    .optional()
 });
 
 type Url = z.infer<typeof urlSchema>;

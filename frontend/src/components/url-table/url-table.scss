@@ -20,6 +20,10 @@
   overflow-x: auto;
 }
 
+.url-table__colgroup col:nth-child(2) {
+  width: 35%;
+}
+
 .url-table__header th.url-table__header__item {
   text-align: left;
   padding: $spacing-3 $spacing-4;

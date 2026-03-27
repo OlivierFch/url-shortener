@@ -1,0 +1,156 @@
+@use "../../styles/tokens" as *;
+
+.top-urls {
+  background: $color-panel;
+  border: 1px solid $color-border;
+  border-radius: $radius;
+  padding: $spacing-4;
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  gap: $spacing-3;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02);
+
+}
+
+.top-urls__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-4;
+  flex-wrap: wrap;
+
+  .top-urls__eyebrow {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $color-accent-dark;
+  }
+
+  .top-urls__period {
+    margin: 0;
+    font-size: 12px;
+    color: $color-text-dim;
+  }
+}
+
+.top-urls__content {
+  min-height: 140px;
+}
+
+.top-urls__toggle-group {
+  display: flex;
+  gap: $spacing-2;
+  margin-top: $spacing-2;
+}
+
+.top-urls__toggle {
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  padding: $spacing-1 $spacing-2;
+  background: $color-bg;
+  font-size: 12px;
+  color: $color-text-dim;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.top-urls__toggle--active {
+  background: $color-accent;
+  color: #fff;
+  border-color: $color-accent;
+}
+
+.top-urls__status {
+  margin: 0;
+  font-size: 14px;
+  color: $color-text-dim;
+}
+
+.top-urls__status--error {
+  color: $color-danger;
+}
+
+.top-urls__grid {
+  display: grid;
+  gap: $spacing-3;
+}
+
+.top-urls__card {
+  background: $color-bg;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  padding: $spacing-3;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.top-urls__card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-urls__card__category {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: $color-accent-dark;
+}
+
+.top-urls__card__count {
+  font-size: 12px;
+  color: $color-text-dim;
+}
+
+.top-urls__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.top-urls__list__item {
+  padding: $spacing-2 $spacing-3;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  background: $color-tint-row-alt;
+  display: flex;
+  justify-content: space-between;
+  gap: $spacing-3;
+}
+
+.top-urls__list__slug {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text;
+}
+
+.top-urls__list__long-url {
+  margin: 0;
+  font-size: 12px;
+  color: $color-text-dim;
+}
+
+.top-urls__list__meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: $spacing-1;
+}
+
+.top-urls__list__hits {
+  font-size: 12px;
+  color: $color-text-dim;
+}
+
+.top-urls__list__short-url {
+  font-size: 12px;
+  color: $color-primary;
+}

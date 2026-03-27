@@ -1,10 +1,12 @@
 import { z } from "zod/v3";
+import { CATEGORY_VALUES } from "../../../constants/categories.ts";
 
 /**
  * Schema for creating a new slug.
  */
 const CreateSlugSchema = z.object({
-  longUrl: z.string().trim().url()
+  longUrl: z.string().trim().url(),
+  category: z.enum(CATEGORY_VALUES).optional()
 });
 
 /**

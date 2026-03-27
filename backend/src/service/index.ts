@@ -1,10 +1,12 @@
-import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount } from "../data-access/index.ts";
+import { createSlug, findAllLinks, findByLongUrl, findBySlug, incrementHitCount, recordVisit, getVisitCountsByLink, findLinksByIds } from "../data-access/index.ts";
 import { generateSlug } from "../utils/generate-slug/generate-slug.ts";
-import { CreateLinkResult, ServiceError } from "../interfaces/index.ts";
+import { CalendarWindow, CreateLinkResult, ServiceError, TopLinksSummary } from "../interfaces/index.ts";
 import { Prisma } from "@prisma/client";
 import type { Link } from "@prisma/client";
 import { getSlugLength } from "../utils/get-slug-length/get-slug-length.ts";
 import { GetLinksQueryParams } from "../router/links/schema/index.ts";
+import { env } from "../env.ts";
+import { groupVisitCountsByCategory, getCalendarMonthWindow } from "./top-links.ts";
 
 const MAX_SLUG_GENERATION_ATTEMPTS = 5;
 
@@ -15,13 +17,13 @@ const MAX_SLUG_GENERATION_ATTEMPTS = 5;
  * @param {string} longUrl - The long URL to shorten.
  * @returns {Promise<CreateLinkResult>} The result containing the link and whether it was already created.
  */
-const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> => {
+const createSlugByLongUrl = async (longUrl: string, category?: string | null): Promise<CreateLinkResult> => {
     for (let attempt = 1; attempt <= MAX_SLUG_GENERATION_ATTEMPTS; attempt++) {
         const slugLength = getSlugLength(attempt);
         const slug = generateSlug(slugLength);
 
         try {
-            const createdLink = await createSlug({ longUrl: longUrl, slug });
+            const createdLink = await createSlug({ longUrl: longUrl, slug, category });
             return { isAlreadyCreated: false, link: createdLink };
         } catch (error: any) {
             // Prisma known error code for unique constraint violation
@@ -64,7 +66,14 @@ const createSlugByLongUrl = async (longUrl: string): Promise<CreateLinkResult> =
  */
 const getUrlBySlug = async (slug: string): Promise<Link | null> => {
     const result = await findBySlug(slug);
-    if (result) await incrementHitCount(slug);
+    if (result) {
+        await incrementHitCount(slug);
+        try {
+            await recordVisit(result.id);
+        } catch (error) {
+            console.error("Failed to create visit record", error);
+        }
+    }
 
     return result;
 };
@@ -78,4 +87,22 @@ const getLinks = async (filter?: GetLinksQueryParams): Promise<Link[]> => {
     return links;
 };
 
-export { createSlugByLongUrl, getLinks, getUrlBySlug, MAX_SLUG_GENERATION_ATTEMPTS };
+const getTopLinksForWindow = async (window: CalendarWindow): Promise<TopLinksSummary> => {
+    const { periodStart, periodEnd } = getCalendarMonthWindow(window);
+    const visitCounts = await getVisitCountsByLink(periodStart, periodEnd);
+    const linkIds = visitCounts.map((entry) => entry.linkId);
+    const links = await findLinksByIds(linkIds);
+
+    const categories = visitCounts.length
+        ? groupVisitCountsByCategory(visitCounts, links, env.BASE_URL)
+        : [];
+
+    return {
+        periodStart: periodStart.toISOString(),
+        periodEnd: periodEnd.toISOString(),
+        window,
+        categories
+    };
+};
+
+export { createSlugByLongUrl, getLinks, getUrlBySlug, getTopLinksForWindow, MAX_SLUG_GENERATION_ATTEMPTS };

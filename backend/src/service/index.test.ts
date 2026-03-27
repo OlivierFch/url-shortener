@@ -17,7 +17,10 @@ jest.mock("../data-access/index.ts", () => ({
     findAllLinks: jest.fn(),
     findByLongUrl: jest.fn(),
     findBySlug: jest.fn(),
-    incrementHitCount: jest.fn()
+    incrementHitCount: jest.fn(),
+    recordVisit: jest.fn(),
+    getVisitCountsByLink: jest.fn(),
+    findLinksByIds: jest.fn()
 }));
 
 jest.mock('@prisma/client', () => {

@@ -7,12 +7,16 @@ import { UrlResponse } from "../../interfaces/index.ts";
  * @param {string} base - The base URL for constructing the short URL. Defaults to "http://localhost:3000".
  * @returns {UrlResponse} The converted UrlResponse object.
  */
+const normalizeBaseUrl = (value: string) => (value.endsWith("/") ? value.slice(0, -1) : value);
+
 const toUrlResponse = (url: Link, base = "http://localhost:3000"): UrlResponse => {
+    const normalizedBase = normalizeBaseUrl(base);
     return {
         slug: url.slug,
         longUrl: url.longUrl,
-        shortUrl: `${base}/${url.slug}`,
-        hitCount: url.hitCount
+        shortUrl: `${normalizedBase}/${url.slug}`,
+        hitCount: url.hitCount,
+        category: url.category ?? null
     };
 };
 

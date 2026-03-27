@@ -1,6 +1,6 @@
 import { env } from "../env";
-import { ApiError, CreateShortLinkResponse, GetAllLinksResponse } from "../interfaces";
-import { isApiErrorShape, isCreateShortLinkResponse, isGetAllLinksResponse } from "../utils/type-guards/type-guard";
+import { ApiError, CreateShortLinkResponse, GetAllLinksResponse, CategoriesResponse, TopLinksResponse, TopLinksWindow } from "../interfaces";
+import { isApiErrorShape, isCreateShortLinkResponse, isGetAllLinksResponse, isGetTopLinksResponse, isCategoriesResponse } from "../utils/type-guards/type-guard";
 
 const BASE = env.VITE_API_BASE_URL ?? "http://localhost:3000";
 
@@ -30,11 +30,14 @@ const readJsonOrThrow = async (res: Response): Promise<unknown> => {
  * @param {string} longUrl - The original long URL to be shortened.
  * @returns {Promise<CreateShortLinkResponse>} The response containing the short url details.
  */
-const createShortLink = async (longUrl: string): Promise<CreateShortLinkResponse> => {
+const createShortLink = async (longUrl: string, category?: string): Promise<CreateShortLinkResponse> => {
+  const payload: Record<string, unknown> = { longUrl };
+  if (category) payload.category = category;
+
   const res = await fetch(`${BASE}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ longUrl })
+    body: JSON.stringify(payload)
   });
 
   const body = await readJsonOrThrow(res);
@@ -78,5 +81,37 @@ const getAllLinks = async (options: GetAllLinksOptions = {}): Promise<GetAllLink
   });
 };
 
-export { createShortLink, getAllLinks };
+const getTopLinks = async (window: TopLinksWindow = "previous"): Promise<TopLinksResponse> => {
+  const params = new URLSearchParams({ window });
+  const res = await fetch(`${BASE}/links/top?${params.toString()}`);
+  const body = await readJsonOrThrow(res);
+
+  if (isGetTopLinksResponse(body)) {
+    return { data: body.data, message: body.message };
+  }
+
+  throw new ApiError({
+    type: "unexpected-error",
+    title: "Unexpected response from GET /links/top",
+    status: 500,
+  });
+};
+
+const getCategories = async (): Promise<CategoriesResponse> => {
+  const res = await fetch(`${BASE}/categories`);
+  const body = await readJsonOrThrow(res);
+
+  if (isCategoriesResponse(body)) {
+    return { data: body.data, message: body.message };
+  }
+
+  throw new ApiError({
+    type: "unexpected-error",
+    title: "Unexpected response from GET /categories",
+    status: 500,
+  });
+};
+
+export { createShortLink, getAllLinks, getTopLinks };
+export { getCategories };
 export type { GetAllLinksOptions };

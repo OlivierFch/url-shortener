@@ -1,5 +1,11 @@
 @use "../../styles/tokens" as *;
 
+.url-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
 .url-form__label {
   display: block;
   margin-bottom: $spacing-2;
@@ -7,8 +13,18 @@
   color: $color-accent;
 }
 
+.url-form__select {
+  width: 100%;
+  padding: $spacing-2 $spacing-3;
+  margin-top: $spacing-2;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  background: $color-panel;
+  color: $color-text;
+  font-size: 14px;
+}
+
 .url-form__input {
-  width: 90%;
   padding: $spacing-3 $spacing-4;
   border: 1px solid $color-border;
   border-radius: $radius-sm;
@@ -49,4 +65,10 @@
   background: $color-primary;
   color: #fff;
   border-color: $color-primary;
+}
+
+.url-form__category-error {
+  margin-top: $spacing-1;
+  font-size: 12px;
+  color: $color-danger;
 }

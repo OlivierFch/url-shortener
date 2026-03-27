@@ -1,8 +1,8 @@
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createShortLink } from "../../services";
-import { ApiError, UrlData } from "../../interfaces";
+import { createShortLink, getCategories } from "../../services";
+import { ApiError, UrlData, CategoryOption } from "../../interfaces";
 import type { Url } from "../../schemas";
 import { urlSchema } from "../../schemas";
 import "./url-form.scss";
@@ -10,6 +10,8 @@ import "./url-form.scss";
 interface UrlFormProps {
     onSuccess: (urlData: UrlData) => void;
 };
+
+const DEFAULT_CATEGORY_OPTION: CategoryOption = { value: "", label: "Aucune catégorie" };
 
 const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
     const {
@@ -20,6 +22,8 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
         reset
     } = useForm<Url>({ resolver: zodResolver(urlSchema) });
     const [messageValue, setMessageValue] = useState<string | null>(null);
+    const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([DEFAULT_CATEGORY_OPTION]);
+    const [categoryError, setCategoryError] = useState<string | null>(null);
 
     const errorMsg = errors.longUrl?.message as string | undefined;
     const successMsg = !errorMsg && messageValue ? String(messageValue) : undefined;
@@ -33,9 +37,28 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
         feedbackClass += " is-success";
     }
 
-    const submitLongUrl = useCallback(async (longUrl: string) => {
+    useEffect(() => {
+        let isMounted = true;
+        getCategories()
+            .then((response) => {
+                if (!isMounted) return;
+                setCategoryError(null);
+                setCategoryOptions([DEFAULT_CATEGORY_OPTION, ...response.data]);
+            })
+            .catch((error) => {
+                if (!isMounted) return;
+                console.error("Failed to fetch categories", error);
+                setCategoryError("Impossible de charger les catégories");
+            });
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const submitLongUrl = useCallback(async ({ longUrl, category }: Url) => {
         try {
-            const { data, message } = await createShortLink(longUrl);
+            const categoryPayload = category ? category : undefined;
+            const { data, message } = await createShortLink(longUrl, categoryPayload);
             onSuccess(data);
             setMessageValue(message);
             reset();
@@ -62,7 +85,7 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
         }
     }, [onSuccess, reset]);
 
-    const onFormSubmit = handleSubmit((url) => submitLongUrl(url.longUrl));
+    const onFormSubmit = handleSubmit((url) => submitLongUrl(url));
 
     return (
         <form onSubmit={onFormSubmit} className="url-form">
@@ -72,6 +95,21 @@ const UrlForm: FunctionComponent<UrlFormProps> = ({ onSuccess }) => {
                 placeholder="https://exemple.com/article..."
                 className="url-form__input"
             />
+            <label className="url-form__label">
+                Catégorie
+                <select id="category" {...register("category")} className="url-form__select">
+                    {categoryOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            {categoryError && (
+                <p className="url-form__category-error" role="status">
+                    {categoryError}
+                </p>
+            )}
             <div className={feedbackClass} role="status" aria-live="polite">
                 {feedbackText}
             </div>
